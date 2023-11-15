@@ -34,6 +34,7 @@ git merge feature/implement-controller-index
 
 4. 推送develop
 git push
+# 可能會需要登入，密碼需要到 https://github.com/settings/tokens 建立新的token用於登入
 
 5. 可選：移除feature/implement-controller-index
 git branch -d feature/implement-controller-index
