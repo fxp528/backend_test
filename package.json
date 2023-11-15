@@ -1,0 +1,28 @@
+{
+  "name": "backend_test",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "serve": "node src/index.js",
+    "test": "cross-env jest e2e/index.spec.js",
+    "test:mock": "cross-env USE_MOCK=true jest e2e/index.spec.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.6.2",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "lodash": "^4.17.21",
+    "mongoose": "^7.6.5"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.23.3",
+    "@babel/preset-env": "^7.23.3",
+    "cross-env": "^7.0.3",
+    "jest": "^29.7.0",
+    "mongodb": "^6.2.0"
+  }
+}
