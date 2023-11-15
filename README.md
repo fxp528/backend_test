@@ -34,3 +34,6 @@ git merge feature/implement-controller-index
 
 4. 推送develop
 git push
+
+5. 可選：移除feature/implement-controller-index
+git branch -d feature/implement-controller-index
