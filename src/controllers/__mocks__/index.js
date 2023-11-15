@@ -23,34 +23,70 @@ async function fetch(dto) {
   });
 }
 
-function importData(_req, res, _next) {
-  return res.json({ success: true });
+/**
+ * 
+ * @param { { 
+*  date: Date, 
+*  dept: string, 
+*  user: string, 
+*  reason: string,
+*  type: '優蹟' | '劣蹟',
+*  count: number
+* }[] } dto 
+* @return { Promise<{ success: true }> }
+*/
+async function importDatas(dto) {
+  return { success: true };
 }
-mockController.importData = importData;
+mockController.importDatas = importDatas;
 
-async function fetchCount(req, res) {
-  try {
-    const datas = await fetch(req.body);
-    return res.json(datas.length);
-  } catch (error) {
-    return res.status(400).json({ msg: error })
-  }
+/**
+ * 
+ * @param { { 
+*  start: Date, 
+*  end: Date, 
+*  dept?: string, 
+*  user?: string, 
+*  type?: '優蹟' | '劣蹟'
+*  } } dto
+* @return { Promise<number> }
+*/
+async function fetchCount(dto) {
+  const datas = await fetch(dto);
+  return datas.length;
 }
 mockController.fetchCount = fetchCount;
 
-async function fetchList(req, res, _next) {
-  const { limit = 5, page = 1, sort = 'date', ...query } = req.body;
-  try {
-    const datas = await fetch(query);
-    const [, sortDir, sortParams] = sort.match(/(-)?(.+)/)
-    const result = sortBy(datas, sortParams);
-    if (sortDir === '-') {
-      result.reverse();
-    }
-    return res.json(result.slice(limit * (page - 1), limit * page));
-  } catch (error) {
-    return res.status(400).json({ msg: error })
+/**
+ * 
+ * @param { { 
+*  start: Date, 
+*  end: Date, 
+*  dept?: string, 
+*  user?: string, 
+*  type?: '優蹟' | '劣蹟',
+*  limit?: number,
+*  page?: number,
+*  sort?: string
+*  } } dto { limit = 5, page = 1, sort = 'date' }
+* @return { Promise<{
+*  date: Date, 
+*  dept: string, 
+*  user: string, 
+*  reason: string,
+*  type: '優蹟' | '劣蹟',
+*  count: number
+* }[]> }
+*/
+async function fetchList(dto) {
+  const { limit = 5, page = 1, sort = 'date', ...query } = dto;
+  const datas = await fetch(query);
+  const [, sortDir, sortParams] = sort.match(/(-)?(.+)/)
+  const result = sortBy(datas, sortParams);
+  if (sortDir === '-') {
+    result.reverse();
   }
+  return result.slice(limit * (page - 1), limit * page);
 }
 mockController.fetchList = fetchList;
 

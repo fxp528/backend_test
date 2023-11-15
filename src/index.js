@@ -10,10 +10,15 @@ const dbName = process.env.MONGO_DB
 if (!dbName) {
   throw '尚未設定MONGO_DB';
 }
-await connectDB(uri, dbName);
+const dbConnection = await connectDB(uri, dbName);
 
 const port = process.env.PORT;
 if (!port) {
   throw '尚未指定PORT';
 }
-app.listen(port);
+const server = app.listen(port);
+server.on('close', async () => {
+  console.log('執行關閉程序...');
+  await dbConnection.close();
+  console.log('關閉程序完成');
+});

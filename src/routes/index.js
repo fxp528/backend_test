@@ -1,9 +1,30 @@
 import { Router } from 'express';
-import { importData, fetchList, fetchCount } from '../controllers/index.js';
+import { importDatas, fetchList, fetchCount } from '../controllers/index.js';
 const router = Router();
 
-router.post('/import', importData);
-router.post('/count', fetchCount);
-router.post('/list', fetchList);
+router.post('/import', async (req, res, next) => {
+  try {
+    const result = await importDatas(req.body);
+    return res.json(result);
+  } catch (error) {
+    return next(error);
+  }
+});
+router.post('/count', async (req, res) => {
+  try {
+    const result = await fetchCount(req.body);
+    return res.json(result);
+  } catch (error) {
+    return res.status(400).json({ msg: error });
+  }
+});
+router.post('/list', async (req, res) => {
+  try {
+    const result = await fetchList(req.body);
+    return res.json(result);
+  } catch (error) {
+    return res.status(400).json({ msg: error });
+  }
+});
 
 export default router;

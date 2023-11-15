@@ -37,12 +37,14 @@ if (process.env.USE_MOCK === 'true') {
 axios.defaults.baseURL = `http://127.0.0.1:${process.env.PORT}`;
 
 describe('Backend_test 測試', () => {
-  let server, dbConnection;
+  let server, dbConnection, spyImportDatas;
   const datas = dataStubs();
   beforeAll(async () => {
     dbConnection = await connectDB(process.env.MONGO_URI, process.env.MONGO_DB);
     const app = (await import('../src/app.js')).default;
     server = app.listen(process.env.PORT);
+    const appController = await import('../src/controllers/index.js');
+    spyImportDatas = jest.spyOn(appController, 'importDatas');
   });
   afterAll(async () => {
     await dbConnection.close();
@@ -70,7 +72,7 @@ describe('Backend_test 測試', () => {
 
   describe('匯入資料', () => {
     it('POST /api/app/import 應回傳 success: true', async () => {
-      expect.assertions(3);
+      expect.assertions(5);
       try {
         const res = await axios.post('/api/app/import', datas);
         expect(res.status).toBe(200);
@@ -80,6 +82,9 @@ describe('Backend_test 測試', () => {
       } catch (error) {
         console.error(error.response?.data || error);
         throw error;
+      } finally {
+        expect(spyImportDatas).toBeCalledTimes(1);
+        expect(spyImportDatas).toBeCalledWith(datas);
       }
     });
   });
@@ -191,7 +196,7 @@ describe('Backend_test 測試', () => {
       }
     });
 
-    it('POST /api/app/list 查詢東西分隊下半年資料，預設排序每頁3筆第2頁', async () => {
+    it('POST /api/app/list 查詢東西分隊下半年資料，預設排序(時間升序)每頁3筆第2頁', async () => {
       expect.assertions(1);
       const start = new Date(2023, 6, 1).toISOString();
       const end = new Date(2023, 12, 31).toISOString();
