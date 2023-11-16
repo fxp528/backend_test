@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 /**
  * 
  * @param { { 
@@ -10,8 +11,40 @@
  * }[] } dto 
  * @return { Promise<{ success: true }> }
  */
+
 async function importDatas(dto) {
-  throw 'not implement'
+  console.log('fimportDatas');
+  const performanceRecordSchema = mongoose.Schema({
+      date: Date,
+      dept: String,
+      user: String,
+      reason: String,
+      type: {
+          type: String,
+          enum: ['優蹟', '劣蹟'],
+      },
+      count: Number,
+  });
+  const PerformanceRecord = mongoose.model(
+      'PerformanceRecord',
+      performanceRecordSchema
+  );
+
+  const performanceRecord = new PerformanceRecord({
+      date: Date.now(),
+      dept: '123',
+      user: 'me',
+      reason: 'run',
+      type: '優蹟',
+      count: 1,
+  });
+
+  // console.log(performanceRecord);
+  // const result = await performanceRecord.save();
+  // console.log(result);
+
+
+  // throw 'not implement'
 }
 
 /**
