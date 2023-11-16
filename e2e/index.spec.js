@@ -2,7 +2,6 @@ import { jest, expect } from '@jest/globals';
 import dotenv from 'dotenv';
 import { resolve } from 'path';
 dotenv.config({ path: resolve(process.cwd(), '.env.test') })
-import { connectDB } from '../src/db.js';
 import axios from 'axios';
 import { dataStubs } from './stubs/index.js';
 import _ from 'lodash';
@@ -17,6 +16,7 @@ if (process.env.USE_MOCK === 'true') {
   console.info('USE MOCK');
   jest.mock('../src/services/index.js');
 } else {
+  /** node_modules的__mocks__會自動引入，需主動取消 */
   jest.unmock('mongoose');
   let dbClient;
   beforeAll(async () => {
@@ -40,7 +40,7 @@ describe('Backend_test 測試', () => {
   let server, dbConnection, spyImportDatas;
   const datas = dataStubs();
   beforeAll(async () => {
-    dbConnection = await connectDB(process.env.MONGO_URI, process.env.MONGO_DB);
+    dbConnection = await (await import('../src/db.js')).connectDB(process.env.MONGO_URI, process.env.MONGO_DB);
     const app = (await import('../src/app.js')).default;
     server = app.listen(process.env.PORT);
     const appService = await import('../src/services/index.js');
