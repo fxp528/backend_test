@@ -1,5 +1,5 @@
 import { jest } from '@jest/globals';
-const mockController = jest.createMockFromModule('../index.js');
+const mockservice = jest.createMockFromModule('../index.js');
 import { dataStubs } from '../../../e2e/stubs/index.js';
 import _ from 'lodash';
 const { filter, isNil, sortBy } = _;
@@ -38,7 +38,7 @@ async function fetch(dto) {
 async function importDatas(dto) {
   return { success: true };
 }
-mockController.importDatas = importDatas;
+mockservice.importDatas = importDatas;
 
 /**
  * 
@@ -55,7 +55,7 @@ async function fetchCount(dto) {
   const datas = await fetch(dto);
   return datas.length;
 }
-mockController.fetchCount = fetchCount;
+mockservice.fetchCount = fetchCount;
 
 /**
  * 
@@ -88,6 +88,6 @@ async function fetchList(dto) {
   }
   return result.slice(limit * (page - 1), limit * page);
 }
-mockController.fetchList = fetchList;
+mockservice.fetchList = fetchList;
 
-module.exports = mockController;
+module.exports = mockservice;

@@ -8,8 +8,8 @@ app.get('/healthcheck', (_req, res) => {
   res.json({ db: mongoose.connection.readyState });
 })
 
-import appRoute from './routes/index.js';
-app.use('/api/app', appRoute);
+import appController from './controllers/index.js';
+app.use('/api/app', appController);
 
 app.use((err, _req, res, _next) => {
   console.error(err);

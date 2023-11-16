@@ -12,11 +12,11 @@ npm run test:mock
 1. 請先切換分支
 > git checkout develop
 2. 建立新分支
-> git branch feature/implement-controller-index
+> git branch feature/implement-service-index
 3. 切換至新的分支
-> git checkout feature/implement-controller-index
+> git checkout feature/implement-service-index
 
-# 請實作 src/controllers/index.js
+# 請實作 src/services/index.js
 
 # 測試
 npm run test
@@ -24,17 +24,17 @@ npm run test
 # 完成後整合到develop分支
 1. 先建立commit，於根目錄
 > git add .
-> git commit -m "implement controller index.js"
+> git commit -m "implement service index.js"
 
 2. 切換至develop
 > git checkout develop
 
 3. 執行merge
-> git merge feature/implement-controller-index
+> git merge feature/implement-service-index
 
 4. 推送develop
 > git push
 # 可能會需要登入，密碼需要到 https://github.com/settings/tokens 建立新的token用於登入
 
-5. 可選：移除feature/implement-controller-index
-> git branch -d feature/implement-controller-index
+5. 可選：移除feature/implement-service-index
+> git branch -d feature/implement-service-index

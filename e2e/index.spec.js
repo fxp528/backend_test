@@ -15,7 +15,7 @@ if (process.env.USE_MOCK === 'true') {
    * 測試展示用資料
    */
   console.info('USE MOCK');
-  jest.mock('../src/controllers/index.js');
+  jest.mock('../src/services/index.js');
   jest.mock('mongoose');
 } else {
   let dbClient;
@@ -43,8 +43,8 @@ describe('Backend_test 測試', () => {
     dbConnection = await connectDB(process.env.MONGO_URI, process.env.MONGO_DB);
     const app = (await import('../src/app.js')).default;
     server = app.listen(process.env.PORT);
-    const appController = await import('../src/controllers/index.js');
-    spyImportDatas = jest.spyOn(appController, 'importDatas');
+    const appService = await import('../src/services/index.js');
+    spyImportDatas = jest.spyOn(appService, 'importDatas');
   });
   afterAll(async () => {
     await dbConnection.close();

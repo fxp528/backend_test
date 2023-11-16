@@ -1,57 +1,30 @@
-/**
- * 
- * @param { { 
- *  date: Date, 
- *  dept: string, 
- *  user: string, 
- *  reason: string,
- *  type: '優蹟' | '劣蹟',
- *  count: number
- * }[] } dto 
- * @return { Promise<{ success: true }> }
- */
-async function importDatas(dto) {
-  throw 'not implement'
-}
+import { Router } from 'express';
+import { importDatas, fetchList, fetchCount } from '../services/index.js';
+const router = Router();
 
-/**
- * 
- * @param { { 
- *  start: Date, 
- *  end: Date, 
- *  dept?: string, 
- *  user?: string, 
- *  type?: '優蹟' | '劣蹟'
- *  } } dto
- * @return { Promise<number> }
- */
-async function fetchCount(dto) {
-  throw 'not implement'
-}
+router.post('/import', async (req, res, next) => {
+  try {
+    const result = await importDatas(req.body);
+    return res.json(result);
+  } catch (error) {
+    return next(error);
+  }
+});
+router.post('/count', async (req, res) => {
+  try {
+    const result = await fetchCount(req.body);
+    return res.json(result);
+  } catch (error) {
+    return res.status(400).json({ msg: error });
+  }
+});
+router.post('/list', async (req, res) => {
+  try {
+    const result = await fetchList(req.body);
+    return res.json(result);
+  } catch (error) {
+    return res.status(400).json({ msg: error });
+  }
+});
 
-/**
- * 
- * @param { { 
- *  start: Date, 
- *  end: Date, 
- *  dept?: string, 
- *  user?: string, 
- *  type?: '優蹟' | '劣蹟',
- *  limit?: number,
- *  page?: number,
- *  sort?: string
- *  } } dto { limit = 5, page = 1, sort = 'date' }
- * @return { Promise<{
- *  date: Date, 
- *  dept: string, 
- *  user: string, 
- *  reason: string,
- *  type: '優蹟' | '劣蹟',
- *  count: number
- * }[]> }
- */
-async function fetchList(dto) {
-  throw 'not implement'
-}
-
-export { importDatas, fetchCount, fetchList };
+export default router;
