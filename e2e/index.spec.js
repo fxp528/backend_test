@@ -16,8 +16,8 @@ if (process.env.USE_MOCK === 'true') {
    */
   console.info('USE MOCK');
   jest.mock('../src/services/index.js');
-  jest.mock('mongoose');
 } else {
+  jest.unmock('mongoose');
   let dbClient;
   beforeAll(async () => {
     /** 移除舊的測試資料 */
