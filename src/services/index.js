@@ -1,4 +1,7 @@
 import mongoose from 'mongoose';
+import {PerformanceRecord} from'../schema/performanceRecord.js'
+import XLSX from 'xlsx';
+import { format, parseISO } from 'date-fns';
 /**
  * 
  * @param { { 
@@ -13,38 +16,45 @@ import mongoose from 'mongoose';
  */
 
 async function importDatas(dto) {
-  console.log('fimportDatas');
-  const performanceRecordSchema = mongoose.Schema({
-      date: Date,
-      dept: String,
-      user: String,
-      reason: String,
-      type: {
-          type: String,
-          enum: ['優蹟', '劣蹟'],
-      },
-      count: Number,
-  });
-  const PerformanceRecord = mongoose.model(
-      'PerformanceRecord',
-      performanceRecordSchema
-  );
+    const workbook = XLSX.read(dto, { type: 'buffer' });
+    // 獲取第一個工作表(目前指定)
+    const firstSheetName = '11200';
+    // console.log('firstSheetName:' + firstSheetName);
+    const worksheet = workbook.Sheets[firstSheetName];
+    // console.log('worksheet:' + JSON.stringify(worksheet));
 
-  const performanceRecord = new PerformanceRecord({
-      date: Date.now(),
-      dept: '123',
-      user: 'me',
-      reason: 'run',
-      type: '優蹟',
-      count: 1,
-  });
+    // 將工作表數據轉換為JSON對象
+    const data = XLSX.utils.sheet_to_json(worksheet, {
+        blankrows: false,
+        // sheetRows: 1,
+    });
+    // console.log('data[1]:' + JSON.stringify(data[1]));
+    for (let i = 0; i < data.length; i++) {
+        const dateObject = new Date((data[i].日期 - 25569) * 86400 * 1000);
 
-  // console.log(performanceRecord);
-  // const result = await performanceRecord.save();
-  // console.log(result);
+        // 使用 date-fns格式化日期
+        data[i].日期 = format(dateObject, 'yyyy-MM-dd');
 
+        const performanceRecord = new PerformanceRecord({
+            date: data[i].日期,
+            dept: data[i].督導單位,
+            user: data[i].人員姓名,
+            reason: data[i].督導事由,
+            type: data[i].獎懲種類,
+            count: data[i].次數,
+        });
 
-  // throw 'not implement'
+        try {
+            const result = await performanceRecord.save();
+            // console.log('result: ' + result);
+        } catch (error) {
+            return error;
+        }
+    }
+    // console.log('formattedData:' + JSON.stringify(formattedData));
+    return { success: true };
+
+    // throw 'not implement'
 }
 
 /**

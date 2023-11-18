@@ -1,10 +1,15 @@
 import { Router } from 'express';
 import { importDatas, fetchList, fetchCount } from '../services/index.js';
+import multer from 'multer';
 const router = Router();
+const upload = multer();
 
-router.post('/import', async (req, res, next) => {
+// router.post('/import', async (req, res, next) => {
+router.post('/import', upload.single('excelFile'), async (req, res, next) => {
+  // 從請求中獲取Excel文件的Buffer
+  const buffer = req.file.buffer;
   try {
-    const result = await importDatas(req.body);
+    const result = await importDatas(buffer);
     return res.json(result);
   } catch (error) {
     return next(error);
