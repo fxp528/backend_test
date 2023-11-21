@@ -20,11 +20,11 @@ router.post('/import', upload.single('excelFile'), async (req, res, next) => {
     }
 });
 router.post('/count', async (req, res) => {
-  try {
+  try {    
     const result = await fetchCount(req.body);
     return res.json(result);
   } catch (error) {
-    return res.status(400).json({ msg: error });
+    return res.status(400).json({ msg: error.message });
   }
 });
 router.post('/list', async (req, res) => {
