@@ -6,8 +6,24 @@ const upload = multer();
 
 // router.post('/import', async (req, res, next) => {
 router.post('/import', upload.single('excelFile'), async (req, res, next) => {
+    const contentType = req.headers['content-type'];
+
+    // 如果是JSON
+    if (contentType === 'application/json') {
+        try {
+          // console.log("body:" + JSON.stringify(req.body));
+            // const jsonData = JSON.parse(req.body);
+            const result = await importDatas(req.body);
+            return res.json(result);
+        } catch (error) {
+            return next(error);
+        }
+    }
+    // 其他先認定為 Excel
+
     // 從請求中獲取Excel文件的Buffer
     const buffer = req.file ? req.file.buffer : null;
+
     if (buffer) {
         try {
             const result = await importDatas(buffer);

@@ -16,32 +16,42 @@ import { format, parseISO } from 'date-fns';
  */
 
 async function importDatas(dto) {
-    const workbook = XLSX.read(dto, { type: 'buffer' });
-    // 獲取第一個工作表(目前指定)
-    const firstSheetName = '11200';
-    // console.log('firstSheetName:' + firstSheetName);
-    const worksheet = workbook.Sheets[firstSheetName];
-    // console.log('worksheet:' + JSON.stringify(worksheet));
+    // console.log('Buffer.isBuffer(dto)' + Buffer.isBuffer(dto))
+    let data;
+    if (Buffer.isBuffer(dto)) {
+        const workbook = XLSX.read(dto, { type: 'buffer' });
+        // 獲取第一個工作表(目前指定)
+        const firstSheetName = '11200';
+        // const firstSheetName = workbook.SheetNames[0];
+        // console.log('firstSheetName:' + firstSheetName);
+        const worksheet = workbook.Sheets[firstSheetName];
+        // console.log('worksheet:' + JSON.stringify(worksheet));
 
-    // 將工作表數據轉換為JSON對象
-    const data = XLSX.utils.sheet_to_json(worksheet, {
-        blankrows: false,
-        // sheetRows: 1,
-    });
+        // 將工作表數據轉換為JSON對象
+        data = XLSX.utils.sheet_to_json(worksheet, {
+            blankrows: false,
+            // sheetRows: 1,
+        });
+        for (let i = 0; i < data.length; i++) {
+            const dateObject = new Date((data[i].日期 - 25569) * 86400 * 1000);
+
+            // 使用 date-fns格式化日期
+            data[i].日期 = format(dateObject, 'yyyy-MM-dd');
+        }
+    } else if (Array.isArray(dto)) {
+        data = dto;
+    }
+
+    // console.log('dto:' + JSON.stringify(dto));
     // console.log('data[1]:' + JSON.stringify(data[1]));
     for (let i = 0; i < data.length; i++) {
-        const dateObject = new Date((data[i].日期 - 25569) * 86400 * 1000);
-
-        // 使用 date-fns格式化日期
-        data[i].日期 = format(dateObject, 'yyyy-MM-dd');
-
         const performanceRecord = new PerformanceRecord({
-            date: data[i].日期,
-            dept: data[i].督導單位,
-            user: data[i].人員姓名,
-            reason: data[i].督導事由,
-            type: data[i].獎懲種類,
-            count: data[i].次數,
+            date: data[i].日期 ? data[i].日期 : data[i].date,
+            dept: data[i].督導單位 ? data[i].督導單位 : data[i].dept,
+            user: data[i].人員姓名 ? data[i].人員姓名 : data[i].user,
+            reason: data[i].督導事由 ? data[i].督導事由 : data[i].reason,
+            type: data[i].獎懲種類 ? data[i].獎懲種類 : data[i].type,
+            count: data[i].次數 ? data[i].次數 : data[i].count,
         });
 
         try {
@@ -107,6 +117,9 @@ async function fetchCount(dto) {
         }
     }
     const performanceRecord = await PerformanceRecord.find(query);
+    // console.log("query: " + JSON.stringify(query));
+    // console.log("performanceRecord:" + performance)
+
     return Object.keys(performanceRecord).length;
     //   throw 'not implement'
 }
@@ -137,7 +150,7 @@ async function fetchList(dto) {
     const pageSize = dto.limit ? dto.limit : 5; // 每頁的紀錄數
     const pageToFetch = dto.page ? dto.page : 1; // 要獲取的頁數
     const skipAmount = (pageToFetch - 1) * pageSize;
-    const sortOrder = dto.sortOrder ? dto.sortOrder : 'desc';
+    const sortOrder = dto.sort ? dto.sort : 'asc';
     let sortOption = {};
     sortOption['date'] = sortOrder === 'asc' ? 1 : -1;
 
@@ -187,7 +200,8 @@ async function fetchList(dto) {
     const performanceRecord = await PerformanceRecord.find(query)
         .sort(sortOption)
         .skip(skipAmount)
-        .limit(pageSize);
+        .limit(pageSize)
+        .select('-__v -_id');
     return performanceRecord;
 //   throw 'not implement'
 }
