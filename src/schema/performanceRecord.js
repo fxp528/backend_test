@@ -12,7 +12,7 @@ const performanceRecordSchema = mongoose.Schema({
     count: Number,
 });
 const PerformanceRecord = mongoose.model(
-    'PerformanceRecord',
+    process.env.MONGO_COLLECTION,
     performanceRecordSchema
 );
 

@@ -50,7 +50,7 @@ async function importDatas(dto) {
  * @return { Promise<number> }
  */
 async function fetchCount(dto) {
-    if (!dto.start || !dto.end) throw new Error('缺少查詢時間');
+    if (!dto.start || !dto.end) throw '缺少查詢時間';
 
     let query = {};
     const startDate = new Date(dto.start);
@@ -62,23 +62,19 @@ async function fetchCount(dto) {
 
     //處理指定分隊
     if (dto.dept) {
-        if (Array.isArray(dto.dept)) {
-            query.dept = {
-                $in: dto.dept,
-            };
-        } else {
+        if (typeof dto.dept === 'string') {
             query.dept = dto.dept;
+        } else {
+            throw '所查詢分隊格式錯誤'
         }
     }
 
     //處理指定人物
     if (dto.user) {
-        if (Array.isArray(dto.user)) {
-            query.user = {
-                $in: dto.user,
-            };
-        } else {
+        if (typeof dto.user === 'string') {
             query.user = dto.user;
+        } else {
+            throw '所查詢人物格式錯誤'
         }
     }
     const performanceRecordCount = await PerformanceRecord.countDocuments(query);
@@ -108,6 +104,7 @@ async function fetchCount(dto) {
  * }[]> }
  */
 async function fetchList(dto) {
+    if (!dto.start || !dto.end) throw '缺少查詢時間';
     let query = {};
     const pageSize = dto.limit ? dto.limit : 5; // 每頁的紀錄數
     const pageToFetch = dto.page ? dto.page : 1; // 要獲取的頁數
@@ -133,23 +130,19 @@ async function fetchList(dto) {
 
     //處理指定分隊
     if (dto.dept) {
-        if (Array.isArray(dto.dept)) {
-            query.dept = {
-                $in: dto.dept,
-            };
-        } else {
+        if (typeof dto.dept === 'string') {
             query.dept = dto.dept;
+        } else {
+            throw '所查詢分隊格式錯誤'
         }
     }
 
     //處理指定人物
     if (dto.user) {
-        if (Array.isArray(dto.user)) {
-            query.user = {
-                $in: dto.user,
-            };
-        } else {
+        if (typeof dto.user === 'string') {
             query.user = dto.user;
+        } else {
+            throw '所查詢人物格式錯誤'
         }
     }
 
@@ -158,7 +151,7 @@ async function fetchList(dto) {
         .skip(skipAmount)
         .limit(pageSize)
         .select('-__v -_id');
-    return performanceRecord;
+    return performanceRecord; 
 }
 
 export { importDatas, fetchCount, fetchList };
