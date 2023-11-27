@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { importDatas, fetchList, fetchCount } from '../services/index.js';
+import { importDatas, fetchList, fetchCount } from '../services';
 const router = Router();
 
 router.post('/import', async (req, res, next) => {

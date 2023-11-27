@@ -1,4 +1,4 @@
-import {PerformanceRecord} from'../schema/performanceRecord.js'
+import {PerformanceRecord} from'../schema/performanceRecord'
 
 /**
  * 

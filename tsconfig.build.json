@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "src"
+  },
+  "exclude": [
+    "e2e",
+    "**/__mocks__/*",
+    "node_modules",
+    "**/node_modules/*"
+  ]
+}

@@ -1,27 +1,26 @@
-import { jest, expect } from '@jest/globals';
 import dotenv from 'dotenv';
 import { resolve } from 'path';
 dotenv.config({ path: resolve(process.cwd(), '.env.test') })
 import axios from 'axios';
-import { dataStubs } from './stubs/index.js';
-import _ from 'lodash';
+import { dataStubs } from './stubs';
+import { filter, sortBy } from 'lodash';
 import { MongoClient } from 'mongodb';
-
-const { filter, sortBy } = _;
+import { Server } from 'http';
+import { Connection } from 'mongoose';
 
 if (process.env.USE_MOCK === 'true') {
   /**
    * 測試展示用資料
    */
   console.info('USE MOCK');
-  jest.mock('../src/services/index.js');
+  jest.mock('../src/services');
 } else {
   /** node_modules的__mocks__會自動引入，需主動取消 */
   jest.unmock('mongoose');
-  let dbClient;
+  let dbClient: MongoClient;
   beforeAll(async () => {
     /** 移除舊的測試資料 */
-    dbClient = await MongoClient.connect(process.env.MONGO_URI);
+    dbClient = await MongoClient.connect(process.env.MONGO_URI ?? '');
     const db = dbClient.db(process.env.MONGO_DB);
     const collectionName = process.env.MONGO_COLLECTION + 's';
     const collections = await db.collections();
@@ -37,14 +36,19 @@ if (process.env.USE_MOCK === 'true') {
 axios.defaults.baseURL = `http://127.0.0.1:${process.env.PORT}`;
 
 describe('Backend_test 測試', () => {
-  let server, dbConnection, spyImportDatas;
+  let server: Server, dbConnection: Connection, spyImportDatas: any;
   const datas = dataStubs();
   beforeAll(async () => {
-    dbConnection = await (await import('../src/db.js')).connectDB(process.env.MONGO_URI, process.env.MONGO_DB);
-    const app = (await import('../src/app.js')).default;
-    server = app.listen(process.env.PORT);
-    const appService = await import('../src/services/index.js');
-    spyImportDatas = jest.spyOn(appService, 'importDatas');
+    try {
+      dbConnection = await (await import('../src/db')).connectDB(process.env.MONGO_URI ?? '', process.env.MONGO_DB ?? '');
+      const app = (await import('../src/app')).default; 
+      server = app.listen(process.env.PORT);
+      const appService = await import('../src/services');
+      spyImportDatas = jest.spyOn(appService, 'importDatas');
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
   });
   afterAll(async () => {
     await dbConnection.close();
@@ -157,7 +161,7 @@ describe('Backend_test 測試', () => {
       }
     });
 
-    let userDataCount;
+    let userDataCount: number;
     it('POST /api/app/count 查詢張大大下半年資料筆數', async () => {
       expect.assertions(1);
       const start = new Date(2023, 6, 1).toISOString();

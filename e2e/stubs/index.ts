@@ -1,4 +1,4 @@
-function date(month, date) {
+function date(month: number, date: number) {
   return new Date(2023, month, date).toISOString();
 }
 
