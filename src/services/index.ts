@@ -1,4 +1,5 @@
-import {PerformanceRecord} from'../schema/performanceRecord'
+import { PerformanceRecord } from '../schema/performanceRecord'
+import { FilterQuery } from 'mongoose';
 
 /**
  * 
@@ -13,20 +14,42 @@ import {PerformanceRecord} from'../schema/performanceRecord'
  * @return { Promise<{ success: true }> }
  */
 
-async function importDatas(dto) {
-    let data;
+type DataType = '優蹟' | '劣蹟'
+
+interface FetchQuery {
+    start: Date;
+    end: Date;
+    dept?: string;
+    user?: string;
+    type?: DataType;
+}
+type ListQuery = { limit?: number, page?: number, sort?: string }
+
+interface Data {
+    date: Date;
+    dept: string;
+    user: string;
+    reason: string;
+    type: DataType;
+    count: number;
+}
+
+async function importDatas(dto: Data[]) {
+    let data: Data[];
     if (Array.isArray(dto)) {
         data = dto;
+    } else {
+        data = [dto];
     }
 
     for (let i = 0; i < data.length; i++) {
         const performanceRecord = new PerformanceRecord({
-            date: data[i].日期 ? data[i].日期 : data[i].date,
-            dept: data[i].督導單位 ? data[i].督導單位 : data[i].dept,
-            user: data[i].人員姓名 ? data[i].人員姓名 : data[i].user,
-            reason: data[i].督導事由 ? data[i].督導事由 : data[i].reason,
-            type: data[i].獎懲種類 ? data[i].獎懲種類 : data[i].type,
-            count: data[i].次數 ? data[i].次數 : data[i].count,
+            date: data[i].date,
+            dept: data[i].dept,
+            user: data[i].user,
+            reason: data[i].reason,
+            type: data[i].type,
+            count: data[i].count,
         });
 
         try {
@@ -49,10 +72,13 @@ async function importDatas(dto) {
  *  } } dto
  * @return { Promise<number> }
  */
-async function fetchCount(dto) {
+async function fetchCount(dto: FetchQuery) {
+    if (!dto) {
+        throw '缺少查詢項目';
+    }
     if (!dto.start || !dto.end) throw '缺少查詢時間';
 
-    let query = {};
+    let query: FilterQuery<Data> = {};
     const startDate = new Date(dto.start);
     let endDate = new Date(dto.end);
     query.date = {
@@ -103,15 +129,13 @@ async function fetchCount(dto) {
  *  count: number
  * }[]> }
  */
-async function fetchList(dto) {
+async function fetchList(dto: FetchQuery & ListQuery) {
     if (!dto.start || !dto.end) throw '缺少查詢時間';
-    let query = {};
+    let query: FilterQuery<Data> = {};
     const pageSize = dto.limit ? dto.limit : 5; // 每頁的紀錄數
     const pageToFetch = dto.page ? dto.page : 1; // 要獲取的頁數
     const skipAmount = (pageToFetch - 1) * pageSize;
-    const sortOrder = dto.sort ? dto.sort : 'asc';
-    let sortOption = {};
-    sortOption['date'] = sortOrder === 'asc' ? 1 : -1;
+    const sortOption: string = dto.sort ? dto.sort : 'date';
 
     //處理日期
     if (dto.start) {
@@ -151,7 +175,7 @@ async function fetchList(dto) {
         .skip(skipAmount)
         .limit(pageSize)
         .select('-__v -_id');
-    return performanceRecord; 
+    return performanceRecord;
 }
 
 export { importDatas, fetchCount, fetchList };

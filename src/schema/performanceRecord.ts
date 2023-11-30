@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const performanceRecordSchema = mongoose.Schema({
+const performanceRecordSchema = new mongoose.Schema({
     date: Date,
     dept: String,
     user: String,
@@ -11,9 +11,14 @@ const performanceRecordSchema = mongoose.Schema({
     },
     count: Number,
 });
+
+if (!process.env.MONGO_COLLECTION) {
+    throw new Error('MONGO_COLLECTION is not defined in the environment variables.');
+}
+
 const PerformanceRecord = mongoose.model(
     process.env.MONGO_COLLECTION,
     performanceRecordSchema
 );
 
-export {PerformanceRecord}
+export { PerformanceRecord }
