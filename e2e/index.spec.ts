@@ -22,7 +22,7 @@ if (process.env.USE_MOCK === 'true') {
     /** 移除舊的測試資料 */
     dbClient = await MongoClient.connect(process.env.MONGO_URI ?? '');
     const db = dbClient.db(process.env.MONGO_DB);
-    const collectionName = process.env.MONGO_COLLECTION + 's';
+    const collectionName = (process.env.MONGO_COLLECTION || '').toLowerCase() + 's';
     const collections = await db.collections();
     if (collections.findIndex((value) => value.collectionName === collectionName) !== -1) {
       await db.collection(collectionName).drop();

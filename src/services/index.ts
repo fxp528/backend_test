@@ -1,18 +1,5 @@
-import { PerformanceRecord } from '../schema/performanceRecord'
+import { PerformanceRecord } from '../schema/performance-record'
 import { FilterQuery } from 'mongoose';
-
-/**
- * 
- * @param { { 
- *  date: Date, 
- *  dept: string, 
- *  user: string, 
- *  reason: string,
- *  type: '優蹟' | '劣蹟',
- *  count: number
- * }[] } dto 
- * @return { Promise<{ success: true }> }
- */
 
 type DataType = '優蹟' | '劣蹟'
 
@@ -61,17 +48,6 @@ async function importDatas(dto: Data[]) {
     return { success: true };
 }
 
-/**
- * 
- * @param { { 
- *  start: Date, 
- *  end: Date, 
- *  dept?: string, 
- *  user?: string, 
- *  type?: '優蹟' | '劣蹟'
- *  } } dto
- * @return { Promise<number> }
- */
 async function fetchCount(dto: FetchQuery) {
     if (!dto) {
         throw '缺少查詢項目';
@@ -108,27 +84,6 @@ async function fetchCount(dto: FetchQuery) {
     return performanceRecordCount;
 }
 
-/**
- * 
- * @param { { 
- *  start: Date, 
- *  end: Date, 
- *  dept?: string, 
- *  user?: string, 
- *  type?: '優蹟' | '劣蹟',
- *  limit?: number,
- *  page?: number,
- *  sort?: string
- *  } } dto { limit = 5, page = 1, sort = 'date' }
- * @return { Promise<{
- *  date: Date, 
- *  dept: string, 
- *  user: string, 
- *  reason: string,
- *  type: '優蹟' | '劣蹟',
- *  count: number
- * }[]> }
- */
 async function fetchList(dto: FetchQuery & ListQuery) {
     if (!dto.start || !dto.end) throw '缺少查詢時間';
     let query: FilterQuery<Data> = {};
