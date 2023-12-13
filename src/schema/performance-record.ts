@@ -1,24 +1,32 @@
-import mongoose from 'mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { HydratedDocument } from 'mongoose';
 
-const performanceRecordSchema = new mongoose.Schema({
-    date: Date,
-    dept: String,
-    user: String,
-    reason: String,
-    type: {
-        type: String,
-        enum: ['優蹟', '劣蹟'],
-    },
-    count: Number,
-});
+export type CatDocument = HydratedDocument<PerformanceRecord>;
 
-if (!process.env.MONGO_COLLECTION) {
-    throw new Error('MONGO_COLLECTION is not defined in the environment variables.');
+@Schema()
+export class PerformanceRecord {
+  @Prop({ type: Date, required: [true, '日期必填'] })
+  date: Date;
+
+  @Prop({ type: String, required: [true, '督導單位必填'] })
+  dept: string;
+
+  @Prop({ type: String, required: [true, '人員姓名必填'] })
+  user: string;
+
+  @Prop({ type: String, required: [true, '督導事由必填'] })
+  reason: string;
+
+  @Prop({
+    type: String,
+    enum: ['優蹟', '劣蹟'],
+    required: [true, '獎懲種類必填'],
+  })
+  type: string;
+
+  @Prop({ type: Number, required: [true, '次數必填'] })
+  count: number;
 }
 
-const PerformanceRecord = mongoose.model(
-    process.env.MONGO_COLLECTION,
-    performanceRecordSchema
-);
-
-export { PerformanceRecord }
+export const PerformanceRecordSchema =
+  SchemaFactory.createForClass(PerformanceRecord);
