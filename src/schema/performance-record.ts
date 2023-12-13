@@ -5,22 +5,26 @@ export type CatDocument = HydratedDocument<PerformanceRecord>;
 
 @Schema()
 export class PerformanceRecord {
-  @Prop({ type: Date })
+  @Prop({ type: Date, required: [true, '日期必填'] })
   date: Date;
 
-  @Prop()
+  @Prop({ type: String, required: [true, '督導單位必填'] })
   dept: string;
 
-  @Prop()
+  @Prop({ type: String, required: [true, '人員姓名必填'] })
   user: string;
 
-  @Prop()
+  @Prop({ type: String, required: [true, '督導事由必填'] })
   reason: string;
 
-  @Prop({ type: String, enum: ['優蹟', '劣蹟'] })
+  @Prop({
+    type: String,
+    enum: ['優蹟', '劣蹟'],
+    required: [true, '獎懲種類必填'],
+  })
   type: string;
 
-  @Prop()
+  @Prop({ type: Number, required: [true, '次數必填'] })
   count: number;
 }
 
